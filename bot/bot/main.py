@@ -1,25 +1,29 @@
-import os
-import logging
-from telegram.ext import Application, CommandHandler
-from bot import ArtOceanBot  # Импорт основного класса бота из bot.py
+# bot/main.py
 
-# Настройка логирования
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+import asyncio
+from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
+from aiogram.types import BotCommand
+from handlers import register_handlers
 
-# Токен твоего бота
-BOT_TOKEN = '8151684930:AAG8u2Gg3oPmOA7sl5-XamwWt57tMyIcLLI'
+TOKEN = "8151684930:AAG8u2Gg3oPmOA7sl5-XamwWt57tMyIcLLI"
 
-def main():
-    # Создаем экземпляр бота
-    art_bot = ArtOceanBot(BOT_TOKEN)
+bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher()
 
-    logger.info("🚀🌊 Запуск Art Ocean Bot...")
-    # Запускаем бота в режиме опроса (polling)
-    art_bot.application.run_polling()
+# Устанавливаем команды, отображаемые в интерфейсе Telegram
+async def set_commands(bot: Bot):
+    commands = [
+        BotCommand(command="/start", description="Запустить бота"),
+        BotCommand(command="/help", description="Помощь"),
+    ]
+    await bot.set_my_commands(commands)
 
-if __name__ == '__main__':
-    main()
+async def main():
+    print("Бот запущен...")
+    await set_commands(bot)
+    register_handlers(dp)
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
